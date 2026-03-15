@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Я - студент ВШЭ</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/ol@v10.8.0/dist/ol.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.8.0/ol.css">
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<style>
+:root {
+  --navy:   #1e3c72;
+  --blue:   #2a5298;
+  --accent: #e8a020;
+  --light:  #eef3ff;
+  --glass:  rgba(255,255,255,0.92);
+  --radius: 14px;
+  --shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+body {
+  font-family: 'Nunito', "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #4f8ef7 0%, #8ec5fc 100%);
+  min-height: 100vh;
+  color: #333;
+}
+header, nav.site-nav, main, section, article, aside, footer {
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: var(--shadow);
+  transition: transform .3s;
+}
+section:hover { transform: translateY(-4px); }
+article:hover { transform: none; }
+header {
+  text-align: center;
+  background: linear-gradient(135deg, var(--navy), var(--blue)) !important;
+  color: white;
+  border-radius: 0;
+  margin-bottom: 0;
+  padding: 70px 20px 50px;
+  position: relative;
+  overflow: hidden;
+}
+header::after {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse 60% 70% at 50% 0%,rgba(255,255,255,.07),transparent 70%);
+  pointer-events:none;
+}
+header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.9rem,5vw,38px);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  color: white;
+}
+header p { margin-bottom: 8px; color: rgba(255,255,255,.8); }
+header p::first-letter { color: white; font-size: 30px; font-weight: bold; }
+header p::first-line   { font-variant: small-caps; }
+header time { color: rgba(255,255,255,.45); font-size:.85rem; }
+.badge-tag {
+  display: inline-block;
+  background: rgba(232,160,32,.18);
+  border: 1px solid rgba(232,160,32,.5);
+  color: var(--accent);
+  border-radius: 50px;
+  padding: 5px 18px;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+nav.site-nav ul {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  list-style: none;
+}
+nav.site-nav a {
+  text-decoration: none;
+  color: var(--navy);
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: .3s;
+}
+nav.site-nav a:hover { background: var(--navy); color: white; }
+h2 { color: var(--navy); margin-bottom: 10px; }
+h3 { color: var(--blue); }
+p { margin-bottom: 12px; line-height: 1.6; }
+p::first-letter { font-size: 30px; font-weight: bold; color: var(--blue); }
+p::first-line   { font-variant: small-caps; }
+img {
+  border-radius: var(--radius);
+  box-shadow: 0 8px 20px rgba(0,0,0,.2);
+  transition: .3s;
+}
+img:hover { transform: scale(1.04); }
+ul { list-style: square inside; margin-top: 10px; }
+ol { padding-left: 20px; margin-top: 10px; }
+li { margin-bottom: 6px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+thead { background: var(--blue); color: white; }
+th, td { padding: 10px; text-align: center; }
+tbody tr:nth-child(even) { background: #eef3ff; }
+tbody tr:hover { background: #d9e6ff; }
+aside {
+  background: #eef4ff;
+  border-left: 6px solid var(--blue);
+  position: relative;
+}
+aside::before {
+  content: "💡";
+  position: absolute;
+  left: -18px; top: -18px;
+  font-size: 32px;
+}
+mark { background: #fff4a3 !important; padding: 3px 5px; border-radius: 4px; }
+video, audio { margin-top: 10px; border-radius: 10px; }
+footer { text-align: center; font-size: 14px; color: #555; }
+main   { display: flex; flex-direction: column; gap: 20px; }
+#chat {
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 10px;
+  max-width: 520px;
+}
+#chatMessages {
+  height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+.message { margin-bottom: 8px; font-size: .92rem; line-height: 1.5; }
+.user { color: blue; font-weight: 700; }
+.bot  { color: green; font-weight: 700; }
+fieldset { border: 1px solid #ccc; padding: 20px; border-radius: 10px; }
+legend   { font-weight: bold; color: var(--navy); padding: 0 6px; }
+legend::first-letter { font-size: 22px; }
+input[type="text"],
+input[type="email"],
+select,
+textarea {
+  width: 320px;
+  padding: 8px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  transition: .3s;
+  font-family: inherit;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--navy);
+  outline: none;
+  box-shadow: 0 0 5px rgba(30,60,114,.4);
+}
+input[type="radio"],
+input[type="checkbox"] { margin-right: 5px; }
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--navy);
+  color: white;
+  cursor: pointer;
+  transition: .3s;
+  font-family: inherit;
+  font-weight: 600;
+}
+button:hover { background: #16305b; transform: translateY(-2px); }
+button[type="reset"]       { background: #888; }
+button[type="reset"]:hover { background: #666; }
+.navbar-top {
+  background: rgba(18,35,88,0.94) !important;
+  backdrop-filter: blur(14px);
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.navbar-top .navbar-brand {
+  font-family: 'Playfair Display', serif;
+  color: var(--accent) !important;
+  font-size: 1.15rem;
+}
+.navbar-top .nav-link {
+  color: rgba(255,255,255,.75) !important;
+  font-weight: 600;
+  font-size: .87rem;
+  padding: 7px 13px !important;
+  border-radius: 20px;
+  transition: .25s;
+}
+.navbar-top .nav-link:hover {
+  background: rgba(255,255,255,.1);
+  color: #fff !important;
+}
+.page-body {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 30px 20px 10px;
+}
+@media (max-width: 800px) {
+  .page-body { padding: 10px; }
+  nav.site-nav ul { flex-direction: column; align-items: center; }
+  img { width: 100%; }
+  input[type="text"],
+  input[type="email"],
+  select, textarea { width: 100%; }
+}
+.fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .55s ease, transform .55s ease;
+}
+.fade-up.shown { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-md navbar-top">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand" href="#top">ВШЭ · 2026</a>
+    <button class="navbar-toggler border-0" type="button"
+            data-bs-toggle="collapse" data-bs-target="#bsNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="bsNav">
+      <ul class="navbar-nav ms-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="#about-section">О программе</a></li>
+        <li class="nav-item"><a class="nav-link" href="#study-section">Дисциплины</a></li>
+        <li class="nav-item"><a class="nav-link" href="#adv-section">Преимущества</a></li>
+        <li class="nav-item"><a class="nav-link" href="#chart-section">Статистика</a></li>
+        <li class="nav-item"><a class="nav-link" href="#chat-section">Чат</a></li>
+        <li class="nav-item"><a class="nav-link" href="#feedback-section">Обратная связь</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header id="top">
+  <div class="badge-tag"><i class="bi bi-mortarboard-fill me-1"></i>Прикладная математика</div>
+  <h1>Я — студент ВШЭ</h1>
+  <p>Учусь на программе <mark>Прикладная математика</mark></p>
+  <time datetime="2026">2026</time>
+</header>
+
+<div class="page-body">
+
+<nav class="site-nav">
+  <ul>
+    <li><a href="#top"><i class="bi bi-house-door me-1"></i>Главная</a></li>
+    <li><a href="#feedback-section"><i class="bi bi-envelope me-1"></i>Обратная связь</a></li>
+  </ul>
+</nav>
+
+<section id="chat-section" class="fade-up">
+  <h2><i class="bi bi-chat-dots me-2" style="color:var(--blue)"></i>Чат со студентом</h2>
+  <div id="chat">
+    <div id="chatMessages"></div>
+    <div class="d-flex gap-2 mt-1">
+      <input type="text" id="chatInput" placeholder="Введите сообщение" style="flex:1; width:auto">
+      <button id="sendBtn"><i class="bi bi-send-fill me-1"></i>Отправить</button>
+      <button id="voiceBtn" title="Голосовой ввод">🎤 Голос</button>
+    </div>
+  </div>
+</section>
+
+<main>
+
+<section id="about-section" class="fade-up">
+  <article>
+    <h2>О программе</h2>
+    <div class="row g-4 align-items-center mt-1">
+      <div class="col-md-7">
+        <p>
+          Я студентка <span><strong>Высшей школы экономики</strong></span>.
+          Учусь на направлении <strong>Прикладная математика</strong>.
+        </p>
+        <p>
+          Цель программы - подготовка специалистов,
+          способных решать задачи в <mark>IT, FinTech и инженерии</mark>.
+        </p>
+        <dl class="mt-3" style="line-height:1.8">
+          <dt><i class="bi bi-calculator text-primary me-1"></i><strong>Математика</strong></dt>
+          <dd class="text-muted ps-3 mb-1">теория и моделирование</dd>
+          <dt><i class="bi bi-code-slash text-primary me-1"></i><strong>IT</strong></dt>
+          <dd class="text-muted ps-3 mb-1">программирование и анализ данных</dd>
+          <dt><i class="bi bi-gear text-primary me-1"></i><strong>Инженерия</strong></dt>
+          <dd class="text-muted ps-3">проектирование систем</dd>
+        </dl>
+      </div>
+      <div class="col-md-5 text-center">
+        <figure class="mb-0">
+          <img src="hse.jpg" width="400"
+               onerror="this.src='https://placehold.co/400x280/1e3c72/ffffff?text=МИЭМ+НИУ+ВШЭ'"
+               alt="Корпус МИЭМ НИУ ВШЭ" class="img-fluid">
+          <figcaption class="mt-2 text-muted" style="font-size:.85rem">Корпус МИЭМ НИУ ВШЭ</figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section id="study-section" class="fade-up">
+  <h2>Что изучают студенты</h2>
+  <div class="row g-4 mt-1">
+    <div class="col-md-6">
+      <ul>
+        <li>математическое моделирование</li>
+        <li>анализ данных</li>
+        <li>искусственный интеллект</li>
+        <li>программирование</li>
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <h3>Этапы обучения</h3>
+      <ol>
+        <li>Фундаментальная математика</li>
+        <li>Программирование</li>
+        <li>Проектная работа</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section id="adv-section" class="fade-up">
+  <h2>Преимущества программы</h2>
+  <table>
+    <thead>
+      <tr><th>№</th><th>Преимущество</th><th>Описание</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td><i class="bi bi-person-badge text-warning me-1"></i>Сильные преподаватели</td>
+        <td class="text-muted">Практики из ведущих IT-компаний</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><i class="bi bi-buildings text-warning me-1"></i>Современные лаборатории</td>
+        <td class="text-muted">Высокопроизводительное оборудование</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><i class="bi bi-diagram-3 text-warning me-1"></i>Проектная работа</td>
+        <td class="text-muted">Реальные задачи от партнёров</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<aside class="fade-up">
+  <h3>Интересный факт</h3>
+  <details>
+    <summary style="cursor:pointer; font-weight:600; color:var(--navy)">
+      Почему МИЭМ известен?
+    </summary>
+    <p class="mt-2">МИЭМ - родина первого факультета прикладной математики в России.</p>
+  </details>
+</aside>
+
+<section id="chart-section" class="fade-up">
+  <h2><i class="bi bi-bar-chart-line me-2" style="color:var(--blue)"></i>Статистика успеваемости</h2>
+  <p class="text-muted" style="font-size:.92rem">
+    Средний балл по дисциплинам и структура учебного плана (демо-данные)
+  </p>
+  <div class="row g-3 mt-1" style="background:white; border-radius:var(--radius); overflow:hidden;">
+    <div class="col-lg-7 p-2">
+      <div id="plotBar" style="width:100%; height:320px;"></div>
+    </div>
+    <div class="col-lg-5 p-2">
+      <div id="plotPie" style="width:100%; height:320px;"></div>
+    </div>
+  </div>
+</section>
+
+<section class="fade-up">
+  <div class="row g-4">
+    <div class="col-md-6">
+      <h2>Видео о ВШЭ</h2>
+      <video width="100%" controls style="max-width:400px">
+        <source src="video.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="col-md-6">
+      <h2>Аудио</h2>
+      <audio controls>
+        <source src="audio.mp3" type="audio/mpeg">
+      </audio>
+    </div>
+  </div>
+</section>
+
+<section class="fade-up">
+  <h2><i class="bi bi-geo-alt me-2" style="color:var(--blue)"></i>Карта</h2>
+  <div id="map" style="width:100%; height:400px; border-radius:10px; overflow:hidden;"></div>
+</section>
+
+</main>
+
+<section id="feedback-section" class="fade-up">
+  <h2><i class="bi bi-envelope-paper me-2" style="color:var(--blue)"></i>Форма обратной связи</h2>
+
+  <form id="feedbackForm" novalidate class="mt-3">
+
+    <fieldset class="mb-3">
+      <legend>Контактная информация</legend>
+      <div class="row g-3 mt-1">
+        <div class="col-md-6">
+          <label for="nameInput" class="d-block mb-1 fw-semibold">Имя</label>
+          <input type="text" id="nameInput" name="name"
+                 list="namesList" placeholder="Введите имя" required>
+          <datalist id="namesList">
+            <option value="Анна">
+            <option value="Мария">
+            <option value="Елена">
+            <option value="Дмитрий">
+          </datalist>
+          <div class="text-danger mt-1 d-none" id="nameErr" style="font-size:.83rem">
+            Пожалуйста, введите имя.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="emailInput" class="d-block mb-1 fw-semibold">Email</label>
+          <input type="email" id="emailInput" name="email"
+                 placeholder="example@edu.hse.ru" required>
+          <div class="text-danger mt-1 d-none" id="emailErr" style="font-size:.83rem">
+            Введите корректный email.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="courseSelect" class="d-block mb-1 fw-semibold">Курс</label>
+          <select id="courseSelect" required>
+            <option value="" disabled selected>— выберите —</option>
+            <optgroup label="Бакалавриат">
+              <option>1 курс</option>
+              <option>2 курс</option>
+              <option>3 курс</option>
+              <option>4 курс</option>
+            </optgroup>
+            <optgroup label="Магистратура">
+              <option>1 курс (маг.)</option>
+              <option>2 курс (маг.)</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Сообщение</legend>
+      <div class="mt-2 mb-3">
+        <label class="d-block mb-1 fw-semibold">Тема</label>
+        <input type="radio" name="topic" id="t1" value="Учёба">
+        <label for="t1" class="me-3">Учёба</label>
+        <input type="radio" name="topic" id="t2" value="Математика">
+        <label for="t2" class="me-3">Математика</label>
+        <input type="radio" name="topic" id="t3" value="Программирование">
+        <label for="t3">Программирование</label>
+      </div>
+      <div class="mb-3">
+        <label for="messageText" class="d-block mb-1 fw-semibold">Сообщение</label>
+        <textarea id="messageText" rows="5"
+                  placeholder="Напишите вопрос или предложение..." required></textarea>
+        <div class="text-danger mt-1 d-none" id="msgErr" style="font-size:.83rem">
+          Напишите сообщение.
+        </div>
+      </div>
+      <div class="mb-3">
+        <label>
+          <input type="checkbox" id="subscribeCheck">
+          Подписаться на новости
+        </label>
+      </div>
+      <div class="d-flex gap-2 flex-wrap">
+        <button type="submit"><i class="bi bi-send me-1"></i>Отправить</button>
+        <button type="reset"><i class="bi bi-arrow-counterclockwise me-1"></i>Очистить</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <div id="successAlert" class="alert alert-success mt-3 d-none" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    Спасибо! Ваше сообщение отправлено. Мы свяжемся с вами в ближайшее время.
+  </div>
+</section>
+
+<footer>
+  <hr>
+  <p>© 2026 Я студент ВШЭ</p>
+</footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+console.log("Страница загружена");
+
+Plotly.newPlot('plotBar', [{
+  type: 'bar',
+  x: ['Матанализ','Лин. алгебра','Python','Алгоритмы','ML','Статистика'],
+  y: [4.3, 4.1, 4.6, 4.0, 4.4, 4.2],
+  marker: {
+    color: [4.3,4.1,4.6,4.0,4.4,4.2],
+    colorscale: [[0,'#2a5298'],[0.5,'#4a7fd4'],[1,'#e8a020']],
+    line: { color:'#fff', width: 1.5 }
+  },
+  text: ['4.3','4.1','4.6','4.0','4.4','4.2'],
+  textposition: 'outside',
+  hovertemplate: '<b>%{x}</b><br>Средний балл: %{y}<extra></extra>'
+}], {
+  title: {
+    text: 'Средний балл по дисциплинам',
+    font: { family:'Playfair Display, serif', size:15, color:'#1e3c72' }
+  },
+  yaxis: { range:[3.5,5], gridcolor:'#eef3ff', tickfont:{size:11} },
+  xaxis: { tickfont:{size:10} },
+  plot_bgcolor:  'rgba(0,0,0,0)',
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  margin: { t:50, b:55, l:40, r:15 }
+}, { responsive:true, displayModeBar:false });
+
+Plotly.newPlot('plotPie', [{
+  type: 'pie',
+  labels: ['Математика','Программирование','Проекты','Общие курсы'],
+  values: [35, 30, 20, 15],
+  hole: 0.42,
+  marker: { colors:['#1e3c72','#2a5298','#e8a020','#6b9ff5'] },
+  textinfo: 'label+percent',
+  hovertemplate: '<b>%{label}</b><br>%{percent}<extra></extra>'
+}], {
+  title: {
+    text: 'Структура учебного плана',
+    font: { family:'Playfair Display, serif', size:15, color:'#1e3c72' }
+  },
+  showlegend: false,
+  plot_bgcolor:  'rgba(0,0,0,0)',
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  margin: { t:50, b:20, l:20, r:20 }
+}, { responsive:true, displayModeBar:false });
+
+const stroginoCoord = ol.proj.fromLonLat([ 37.409846,55.803474]);
+new ol.Map({
+  target: 'map',
+  layers: [
+    new ol.layer.Tile({ source: new ol.source.OSM() })
+  ],
+  view: new ol.View({ center: stroginoCoord, zoom: 14 })
+});
+
+const REPLIES = {
+  'программа':  'Программа «Прикладная математика» - одна из сильнейших в стране!',
+  'математика': 'Матанализ и линейная алгебра - основа. Сложно, но интересно!',
+  'вшэ':        'ВШЭ - отличный вуз с сильным сообществом студентов и преподавателей.',
+  'привет':     'Привет! Рада пообщаться. Спрашивай про учёбу!',
+  'миэм':       'МИЭМ - технический кампус ВШЭ, родина прикладной математики в России.',
+  };
+
+function addMsg(text, role) {
+  const box = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'message';
+  div.innerHTML = `<span class="${role}">${role === 'user' ? 'Вы' : 'Студент'}:</span> ${text}`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+function getReply(msg) {
+  const low = msg.toLowerCase();
+  for (const [k, v] of Object.entries(REPLIES)) if (low.includes(k)) return v;
+  return 'Интересный вопрос!';
+}
+document.getElementById('sendBtn').addEventListener('click', () => {
+  const inp = document.getElementById('chatInput');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  addMsg(txt, 'user');
+  inp.value = '';
+  setTimeout(() => addMsg(getReply(txt), 'bot'), 550);
+});
+document.getElementById('chatInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('sendBtn').click();
+});
+
+document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  let ok = true;
+  const name  = document.getElementById('nameInput');
+  const email = document.getElementById('emailInput');
+  const msg   = document.getElementById('messageText');
+  const show  = (id, cond) => document.getElementById(id).classList.toggle('d-none', cond);
+  show('nameErr',  name.value.trim() !== '');  if (!name.value.trim())    ok = false;
+  show('emailErr', email.validity.valid);       if (!email.validity.valid) ok = false;
+  show('msgErr',   msg.value.trim() !== '');   if (!msg.value.trim())     ok = false;
+  if (!ok) return;
+  const al = document.getElementById('successAlert');
+  al.classList.remove('d-none');
+  this.reset();
+  setTimeout(() => al.classList.add('d-none'), 5000);
+});
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('shown'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+</script>
+
+<noscript>Ваш браузер не поддерживает JavaScript</noscript>
+</body>
+</html>
